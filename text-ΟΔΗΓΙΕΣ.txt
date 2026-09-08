@@ -1,0 +1,44 @@
+1.-Dos- Αυτά πρέπει να κατεβάσεις στο cmd πριν τρέξεις τα commands.
+npm install                         |
+                                    |
+npx prisma migrate dev --name init  |
+                                    |
+npm run prisma:seed                 |
+                                    |                    
+                                    |
+--------------------------------------------------------------------------
+
+2.Ανοίγεις το cmd για αρχή και μπαίνεις στον φάκελο του αρχείου σου:
+πχ.
+Για εμένα είναι το εξής path:
+
+"C:\Users\arman\OneDrive\Desktop\marketplace\backend"
+
+οπότε γράφεις στο cmd: 
+α.cd C:\Users\arman\OneDrive\Desktop\marketplace\backend
+
+β.npm run dev (για το backend) 
+παράλληλα ανοίγεις και δεύετρο cmd για το frontend και τρέχεις αντίστοιχα:
+
+cd C:\Users\arman\OneDrive\Desktop\marketplace\frontend
+
+npm run dev 
+
+γ. Πας στο google chrome και πατάς: http://localhost:5173/ 
+και σου ανοίγει η σελίδα.
+
+---------------------------------------------------------------------------
+
+Το Backend API είναι για την βαση δεδομένων θα το βρεις στο backend αρχειο .env:
+
+DATABASE_URL="postgresql://postgres.nacrnztkdzseapzilpmw:DAMAAIDWQQ3444@aws-1-eu-west-1.pooler.supabase.com:5432/postgres"
+
+Φτιάχνεις account στο supabase κρατας το password του account σου γτ θα το βάλεις στο link πχ στο δικό μου ο:DAMAAIDWQQ3444
+
+Στο supabase πατας: 1. start new project, 2.  Στο Get connected κάπου στην μέση πατάς το ORM στα δέξια σου παίρνεις το: DATABASE_URL
+και το βάζεις στο κώδικα σου με το password του account σου.
+
+Τέλος για να βλέπεις πωλήσεις και τα σχετικά κάνεις account στο: Sandbox
+μετά κατευθείαν στο λινκ: https://dashboard.stripe.com/acct_1UABnP57rceVcelJ/test/apikeys
+
+κάνεις copy to Secret Key και το βάζεις στο backend στο: STRIPE_SECRET_KEY
