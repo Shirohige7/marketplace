@@ -1,0 +1,61 @@
+{
+  "info": { "name": "Marketplace API", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "buyerToken", "value": "" },
+    { "key": "vendorToken", "value": "" },
+    { "key": "productId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Register vendor",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/register",
+        "body": { "mode": "raw", "raw": "{\"email\":\"vendor2@example.com\",\"password\":\"password123\",\"role\":\"VENDOR\",\"storeName\":\"Test Store\"}" }
+      }
+    },
+    {
+      "name": "Login buyer",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/login",
+        "body": { "mode": "raw", "raw": "{\"email\":\"buyer@example.com\",\"password\":\"password123\"}" }
+      }
+    },
+    {
+      "name": "List products (public)",
+      "request": { "method": "GET", "url": "{{baseUrl}}/products" }
+    },
+    {
+      "name": "Checkout (buyer)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{buyerToken}}" }
+        ],
+        "url": "{{baseUrl}}/checkout",
+        "body": { "mode": "raw", "raw": "{\"items\":[{\"productId\":\"{{productId}}\",\"qty\":1}]}" }
+      }
+    },
+    {
+      "name": "My orders (buyer)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{buyerToken}}" }],
+        "url": "{{baseUrl}}/orders/mine"
+      }
+    },
+    {
+      "name": "Vendor sub-orders",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{vendorToken}}" }],
+        "url": "{{baseUrl}}/orders/vendor/mine"
+      }
+    }
+  ]
+}

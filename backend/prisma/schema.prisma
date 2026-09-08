@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BUYER
+  VENDOR
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  CANCELLED
+}
+
+enum VendorOrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(BUYER)
+  vendor       Vendor?
+  orders       Order[]
+  createdAt    DateTime @default(now())
+}
+
+model Vendor {
+  id            String         @id @default(uuid())
+  userId        String         @unique
+  user          User           @relation(fields: [userId], references: [id])
+  storeName     String
+  products      Product[]
+  vendorOrders  VendorOrder[]
+  ledgerEntries VendorLedger[]
+  createdAt     DateTime       @default(now())
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  vendorId    String
+  vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  name        String
+  description String?
+  price       Decimal     @db.Decimal(10, 2)
+  stockQty    Int
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+}
+
+model Order {
+  id                     String        @id @default(uuid())
+  buyerId                String
+  buyer                  User          @relation(fields: [buyerId], references: [id])
+  totalAmount            Decimal       @db.Decimal(10, 2)
+  status                 OrderStatus   @default(PENDING_PAYMENT)
+  stripePaymentIntentId  String?       @unique
+  vendorOrders           VendorOrder[]
+  payment                Payment?
+  createdAt              DateTime      @default(now())
+}
+
+model VendorOrder {
+  id       String            @id @default(uuid())
+  orderId  String
+  order    Order             @relation(fields: [orderId], references: [id])
+  vendorId String
+  vendor   Vendor            @relation(fields: [vendorId], references: [id])
+  subtotal Decimal           @db.Decimal(10, 2)
+  status   VendorOrderStatus @default(PENDING)
+  items    OrderItem[]
+}
+
+model OrderItem {
+  id            String      @id @default(uuid())
+  vendorOrderId String
+  vendorOrder   VendorOrder @relation(fields: [vendorOrderId], references: [id])
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id])
+  qty           Int
+  unitPrice     Decimal     @db.Decimal(10, 2)
+}
+
+model Payment {
+  id                    String   @id @default(uuid())
+  orderId               String   @unique
+  order                 Order    @relation(fields: [orderId], references: [id])
+  stripePaymentIntentId String   @unique
+  status                String
+  amount                Decimal  @db.Decimal(10, 2)
+  createdAt             DateTime @default(now())
+}
+
+model VendorLedger {
+  id          String   @id @default(uuid())
+  vendorId    String
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
+  orderId     String
+  amountOwed  Decimal  @db.Decimal(10, 2)
+  settled     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+// Guarantees webhook idempotency: a Stripe event is only ever applied once,
+// even if Stripe retries delivery.
+model WebhookEvent {
+  id            String   @id @default(uuid())
+  stripeEventId String   @unique
+  type          String
+  processedAt   DateTime @default(now())
+}
